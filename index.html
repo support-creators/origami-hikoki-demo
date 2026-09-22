@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>おりがみヒコーキの おりかた</title>
+<style>
+  :root{
+    --sky:#e8f4fd; --blue:#1e6fd9; --blue-d:#154f9c; --red:#e8542f;
+    --ink:#1f2a37; --sub:#5b6b7d; --card:#ffffff; --line:#d6e4f2;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--sky); color:var(--ink);
+    font-family:"Hiragino Maru Gothic ProN","BIZ UDPGothic","Meiryo",sans-serif;
+    line-height:1.7;
+  }
+  header{
+    background:var(--blue); color:#fff; text-align:center;
+    padding:28px 16px 24px;
+  }
+  header h1{margin:0; font-size:clamp(24px,6vw,36px); letter-spacing:.05em; word-break:keep-all}
+  header p{margin:6px 0 0; font-size:15px; opacity:.9; word-break:keep-all}
+  main{max-width:760px; margin:0 auto; padding:24px 16px 40px}
+  ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px}
+  li{
+    background:var(--card); border:2px solid var(--line); border-radius:14px;
+    padding:14px 16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .no{
+    flex:0 0 auto; width:44px; height:44px; border-radius:50%;
+    background:var(--red); color:#fff; font-weight:bold; font-size:22px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .name{flex:1 1 180px; font-size:22px; font-weight:bold; white-space:nowrap}
+  .links{display:flex; gap:8px; flex-wrap:wrap}
+  .btn{
+    display:inline-block; text-decoration:none; font-weight:bold; font-size:15px;
+    padding:10px 14px; border-radius:10px; white-space:nowrap; text-align:center;
+  }
+  .app{background:var(--blue); color:#fff}
+  .app:hover{background:var(--blue-d)}
+  .pdf{background:#fff; color:var(--blue); border:2px solid var(--blue)}
+  .pdf:hover{background:var(--sky)}
+  .soon{background:#e5e9ee; color:var(--sub); cursor:default}
+  footer{text-align:center; color:var(--sub); font-size:13px; padding:0 16px 28px}
+  @media (max-width:520px){
+    .links{width:100%}
+    .btn{flex:1 1 auto}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>おりがみヒコーキの おりかた</h1>
+  <p>つくりたい ヒコーキを えらんでね</p>
+</header>
+
+<main>
+  <ul>
+    <li>
+      <span class="no">1</span>
+      <span class="name">ヤリ型1号</span>
+      <span class="links"><a class="btn app" href="yarigata1.html">▶ うごく おりかた</a></span>
+    </li>
+    <li>
+      <span class="no">2</span>
+      <span class="name">エアーキング</span>
+      <span class="links"><span class="btn soon">さくせいちゅう</span></span>
+    </li>
+    <li>
+      <span class="no">3</span>
+      <span class="name">スカイキング</span>
+      <span class="links"><span class="btn soon">さくせいちゅう</span></span>
+    </li>
+    <li>
+      <span class="no">4</span>
+      <span class="name">ミッドキングＳ</span>
+      <span class="links"><span class="btn soon">さくせいちゅう</span></span>
+    </li>
+    <li>
+      <span class="no">5</span>
+      <span class="name">ハヤテ</span>
+      <span class="links"><span class="btn soon">さくせいちゅう</span></span>
+    </li>
+    <li>
+      <span class="no">6</span>
+      <span class="name">ゼロファイター</span>
+      <span class="links"><span class="btn soon">さくせいちゅう</span></span>
+    </li>
+  </ul>
+</main>
+
+<footer>出典：折り紙ヒコーキ協会</footer>
+</body>
+</html>
