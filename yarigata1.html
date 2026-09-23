@@ -1,27 +1,17 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ヤリ型1号 折りマニュアル V260921.9</title>
+<title>ヤリ型1号 折りマニュアル V260923.3</title>
 <style>
 :root{
   --bg:#e6eaef; --bg-3d:#dfe4ea; --ink:#1f2a36; --sub:#5b6775;
   --bar:#ffffff; --line:#c9d1da; --accent:#2f6fd6; --accent-ink:#ffffff;
   --fold-guide:#ca2b1a; --target-guide:#205ec8;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#1a2029; --bg-3d:#212833; --ink:#e8edf3; --sub:#a4afbc;
-    --bar:#262e3a; --line:#3a4453; --accent:#5b8fe6; --accent-ink:#0f1520;
-    --fold-guide:#ff8a78; --target-guide:#8db9ff;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#1a2029; --bg-3d:#212833; --ink:#e8edf3; --sub:#a4afbc;
-  --bar:#262e3a; --line:#3a4453; --accent:#5b8fe6; --accent-ink:#0f1520;
-  --fold-guide:#ff8a78; --target-guide:#8db9ff;
-}
+/* 背景はPC・スマホとも同じ明るい灰色に固定（ダークモードでも切り替えない） */
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{
@@ -31,11 +21,13 @@ body{
 }
 header{padding:14px 18px 6px}
 h1{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:.02em}
-.step{margin:4px 0 0;font-size:.92rem;color:var(--sub)}
+.step{margin:4px 0 0;font-size:.92rem;color:var(--sub);word-break:auto-phrase}
 #stage{position:relative;flex:1;min-height:0;touch-action:none}
 #stage canvas{display:block;width:100%;height:100%}
 #a7guide{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none;overflow:visible;color:var(--ink)}
-#a7guide[hidden],#a7legend[hidden]{display:none}
+#a7guide[hidden],#a7legend[hidden],#wingmarks[hidden]{display:none}
+#wingmarks{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none;overflow:visible}
+#wingmarks circle{fill:none;stroke:var(--fold-guide);stroke-width:2.5;stroke-dasharray:4 3}
 #a7guide path{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 #a7guide .measure{stroke-dasharray:3 3;opacity:.8}
 #a7guide .fold-tick{stroke:var(--fold-guide);stroke-width:4}
@@ -58,7 +50,7 @@ h1{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:.02em}
   background:rgba(0,0,0,.45);color:#fff;font-size:28px;line-height:72px;text-align:center;opacity:0;pointer-events:none}
 #biglabel{position:absolute;left:50%;top:0;transform:translateX(-50%);width:max-content;max-width:94%;text-align:center;pointer-events:none;
   z-index:2;color:#E0301E;font-weight:800;font-size:clamp(19px,5vw,30px);line-height:1.35;
-  text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 6px #fff;transition:opacity .8s ease}
+  text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 6px #fff;transition:opacity .8s ease;word-break:auto-phrase;text-wrap:balance}
 #tapfx.show{animation:tapfx .7s ease-out}
 @keyframes tapfx{0%{opacity:0;transform:scale(.8)}20%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
 .bar{
@@ -86,11 +78,12 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
 </head>
 <body>
 <header>
-  <h1>ヤリ型1号 折りマニュアル <small style="font-size:.6em;color:#8E97A2">V260921.9</small></h1>
+  <h1>ヤリ型1号 折りマニュアル <small style="font-size:.6em;color:#8E97A2">V260923.3</small></h1>
   <p class="step" id="steptext"></p>
 </header>
 <div id="stage"><span class="hint">タップで再生・停止／ドラッグで回転／ピンチで拡大</span><div id="tapfx" aria-hidden="true"></div><div id="biglabel"></div>
   <div id="finishTitle" aria-live="polite"><strong>やり型１号</strong></div>
+  <svg id="wingmarks" hidden aria-hidden="true"><circle id="wm1" r="11"></circle><circle id="wm2" r="11"></circle></svg>
   <div id="a7legend" hidden><span class="fold">赤：折る位置（a）</span><span class="target">青：先端の合わせ先（2a）</span></div>
   <svg id="a7guide" aria-label="⑦ 先端からV字の合流点までをaずつ三等分。aの位置で折り、先端を2aの印に合わせる" role="img" hidden>
     <g id="a7first"><path class="measure" id="a7axis0"></path><path id="a7tipTick"></path><text class="a7label">a</text></g>
@@ -128,7 +121,7 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
   // ================= 基本設定（単位 mm） =================
   const W = 210, H = 297, CX = W / 2;   // A4縦。紙の座標：左下(0,0)、機首は下
   const REAL_T = 0.02;   // 紙の厚みは見えない程度にする（完全な0は重なった紙がちらつくため）
-  const COL = { front:0x2f6fd6, back:0xf7f7f3, edge:0x9aa3ad, line:0x49525e, fold:0x8e97a2, crease:0xa9b1bb };
+  const COL = { front:0x3b82f6, back:0xffffff, edge:0x26323f, line:0x26323f, fold:0x26323f, crease:0x98a4b1 };
   const EPS = 1e-6;
 
   // ================= 工程の定義（ヤリ型1号） =================
@@ -149,12 +142,15 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
   // その二等分線を後端まで延ばす。紙全長 H を斜辺の高さに使うと約14.5mmずれる。
   const TAILY = H * Math.tan(Math.atan(CX / Y3) / 2);
   const WQ = [CX - TAILY, H];           // ⑨⑩の折線の後端側の点（機首の先端から後端へ）
+  const HYP = Math.hypot(CX, Y3);       // ⑨：長い斜辺の長さ。斜辺の角(0,Y3)は底辺（背骨）の先端からHYPの位置に重なる
   const OPEN = 0.5;                     // ⑪で翼を開く量（0.5 = 90°＝水平）
   const STEPS = [
     { no:'①', ops:[
-      { label:'a4の紙を縦長方向に半分に折って戻す', p:[CX,0], q:[CX,H], side:[0,H/2], dir:'valley', mode:'crease', w:1.8 },
-      { label:'紙を裏返して山折りの面を上にする', mode:'flip', w:1.3 },
-      { label:'山折りの向きを確かめる', mode:'ridge', w:0.9 },
+      // 横向きの紙から始める（rz：紙を画面の中で回す角度。π/2＝横向き、0＝縦向き）。zoom：横向きでも紙全体が入る距離
+      { label:'横向きの紙の下の辺を上の辺に合わせて半分に折り、開く', p:[CX,0], q:[CX,H], side:[0,H/2], dir:'valley', mode:'crease', w:1.8, rz:Math.PI/2, zoom:1.45 },
+      { label:'紙を裏返す', mode:'flip', w:1.3, rz:Math.PI/2, zoom:1.45 },
+      { label:'紙を回して縦向きにする', mode:'focus', w:1.4, rz:0, zoom:1.45 },
+      { label:'中央が山折りになっていることを確認する', mode:'ridge', w:1.3, rz:0, zoom:1 },
     ]},
     { no:'②', ops:[
       { label:'下の左右の角を中央の線に合わせて折る', p:[CX,0], q:[0,CX], side:[0,0], dir:'valley', mode:'fold', w:1 },
@@ -184,8 +180,9 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
       { label:'中央の線で裏側へ半分に折る', p:[CX,0], q:[CX,H], side:[W-1,H/2], dir:'mountain', mode:'fold', w:1.8, turn:-0.9, markSide:true },
     ]},
     { no:'⑨', ops:[
-      { label:'長い斜辺を底辺に重ねて片方の翼を折る', p:[CX,0], q:WQ, side:[1,200], dir:'valley', mode:'fold', w:1.8,
-        only:{ side:'F' }, tag:'wingF', turn:0.35 },
+      { label:'飛行機全体と、合わせる印（○）を確認する', mode:'focus', w:1.6, wingMark:'preview' },
+      { label:'斜辺の角の印（○）を底辺の印に合わせて、翼を手前に折る', p:[CX,0], q:WQ, side:[1,200], dir:'valley', mode:'fold', w:1.8,
+        only:{ side:'F' }, tag:'wingF', turn:0.35, wingMark:'F' },
     ]},
     { no:'⑩', ops:[
       { label:'機体を裏返し、まだ折っていない翼を上にする', mode:'flip', w:1.2 },
@@ -237,7 +234,7 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
     let out = [];
     faces.forEach((f, fi) => {
       const a = op.p ? toLocal(f.rest, op.p) : null, b = op.q ? toLocal(f.rest, op.q) : null;
-      const cut = (op.mode === 'pose' || op.mode === 'nose' || op.mode === 'flip' || op.mode === 'ridge') ? null : splitPoly(f.poly, a, b);
+      const cut = (op.mode === 'pose' || op.mode === 'nose' || op.mode === 'flip' || op.mode === 'ridge' || op.mode === 'focus') ? null : splitPoly(f.poly, a, b);
       if (cut) cut.forEach(P => out.push({ poly:P, rest:f.rest.clone(), layer:f.layer, side:f.side, tags:f.tags||[], l0:f.l0, parent:fi }));
       else out.push({ poly:f.poly, rest:f.rest.clone(), layer:f.layer, side:f.side, tags:f.tags||[], l0:f.l0, parent:fi });
     });
@@ -245,6 +242,7 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
     if (op.mode === 'pose') return applyPose(out, op, ctx);
     if (op.mode === 'flip') return applyFlip(out, op, ctx);
     if (op.mode === 'ridge') return applyRidge(out, op, ctx);
+    if (op.mode === 'focus') return applyFocus(out, op, ctx);
     if (op.mode === 'nose') return applyNose(faces, op, ctx);
     const sideSign = Math.sign(cross(op.p, op.q, op.side));
     const isMoving = f => {
@@ -371,7 +369,7 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
     const faceHinge = op.mode === 'unfold' && op.tags ? out.map((f,i) => { if (!moving[i]) return null;
       const h = ctx.hinges[op.tags.find(t => (f.tags||[]).includes(t))]; return { pivot:h.pivot, axis:h.axis, sign:-h.sign }; }) : null;
     if (op.redLines) edges.forEach(list => list.forEach(e => { e.red = e.nb >= 0 && op.redLines.some(([a,b]) => onSegW(e.wp,a,b) && onSegW(e.wq,a,b)); }));
-    return { faces:out, moving, cam:op.cam, pivot: H6 ? H6.pivot : pivot, axis: H6 ? H6.axis : axis, sign: H6 ? -H6.sign : sign, mode:op.mode, w:op.w, label:op.label, turn:op.turn||0, tilt:op.tilt||0, after, edges, dz, rev, focus:op.focus, sides: out.map(f=>f.side), faceHinge };
+    return { wingMark:op.wingMark, faces:out, moving, cam:op.cam, pivot: H6 ? H6.pivot : pivot, axis: H6 ? H6.axis : axis, sign: H6 ? -H6.sign : sign, mode:op.mode, w:op.w, label:op.label, turn:op.turn||0, tilt:op.tilt||0, after, edges, dz, rev, focus:op.focus, sides: out.map(f=>f.side), faceHinge };
   }
 
   // となり合う辺（紙の座標で一致する辺）
@@ -534,13 +532,24 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
              pivot:new THREE.Vector3(), axis:new THREE.Vector3(1,0,0), sign:1 };
   }
 
+  // 紙を動かさず、印（○）を見せるための工程（エアーキング⑫と同じ）。
+  function applyFocus(out, op, ctx){
+    const faces = out.map(f => ({ poly:f.poly, rest:f.rest.clone(), layer:f.layer, side:f.side, tags:f.tags||[], l0:f.l0 }));
+    const after = faces.map(f => ({ ...f, rest:f.rest.clone() }));
+    const edges = findEdges(faces, {});
+    edges.forEach(list => list.forEach(e => { e.quiet = false; e.marks = []; }));
+    return { faces, moving:faces.map(()=>false), mode:'focus', w:op.w, label:op.label, wingMark:op.wingMark,
+      turn:0, tilt:0, after, edges, dz:faces.map(()=>0), rev:null, sides:faces.map(f=>f.side), focus:op.focus,
+      pivot:new THREE.Vector3(), axis:new THREE.Vector3(1,0,0), sign:1 };
+  }
+
   // 中央だけ少し尖らせる。両端を床の高さに保ち、紙の両半分を内側へ寄せて頂点をつなぐ。
   function applyRidge(out, op, ctx){
     const faces = out.map(f => ({ poly:f.poly, rest:f.rest.clone(), layer:f.layer, side:f.side, tags:f.tags||[], l0:f.l0 }));
     const side = faces.map(f => toWorld(f.rest, centroid(f.poly)).x < CX ? -1 : 1);
     const axis = new THREE.Vector3(0,1,0);
     const poseAt = (f, t, i) => {
-      const angle = 0.11 * Math.sin(Math.PI * t);
+      const angle = Math.asin(3 * Math.sin(0.11)) * Math.sin(Math.PI * t); // 中央の持ち上がりを従来の3倍にする（エアーキングと同じ）
       const outer = side[i] < 0 ? 0 : W;
       const inward = side[i] < 0 ? 1 : -1;
       const shift = inward * CX * (1 - Math.cos(angle));
@@ -591,10 +600,11 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
     const center = fs => { let a=[1e9,1e9], b=[-1e9,-1e9];
       fs.forEach(f => f.poly.forEach(p => { const v = toWorld(f.rest, p); a=[Math.min(a[0],v.x),Math.min(a[1],v.y)]; b=[Math.max(b[0],v.x),Math.max(b[1],v.y)]; }));
       return { x:(a[0]+b[0])/2, y:(a[1]+b[1])/2, zoom:1 }; };
-    let view = center(faces);
+    let view = { ...center(faces), zoom:STEPS[0].ops[0].zoom || 1 }, rz = STEPS[0].ops[0].rz || 0;
     return STEPS.map(st => {
       const subs = st.ops.map(op => { const r = applyOp(faces, op, T, ctx); faces = r.after;
-        r.view0 = view; r.view1 = op.focus ? { ...op.focus } : center(r.after); if (op.zoom) r.view1.zoom = op.zoom; view = r.view1; return r; });
+        r.view0 = view; r.view1 = op.focus ? { ...op.focus } : center(r.after); if (op.zoom) r.view1.zoom = op.zoom; view = r.view1;
+        r.rz0 = rz; if (op.rz !== undefined) rz = op.rz; r.rz1 = rz; return r; });
       return { ...st, subs, total: subs.reduce((s,x)=>s+x.w,0) };
     });
   }
@@ -628,7 +638,9 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
   const sun = new THREE.DirectionalLight(0xffffff, 0.42); sun.position.set(-200, 300, 600); scene.add(sun);
   const under = new THREE.DirectionalLight(0xffffff, 0.35); under.position.set(150, -200, -500); scene.add(under);
   const holder = new THREE.Group(); holder.rotation.x = -0.55; scene.add(holder);
-  const paper = new THREE.Group(); paper.position.set(-CX, -H/2, 0); holder.add(paper);
+  // spin：紙を画面の中で回す（①の横向き→縦向き）。紙の中心まわりに回るよう、paper の位置はそのまま
+  const spin = new THREE.Group(); holder.add(spin);
+  const paper = new THREE.Group(); paper.position.set(-CX, -H/2, 0); spin.add(paper);
   let viewZoom = 1;
 
   const faceMat = (color, side) => new THREE.MeshStandardMaterial({ color, side, roughness:0.9, metalness:0,
@@ -700,7 +712,7 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
     return g;
   }
 
-  let timeline = [], T = REAL_T, curSub = null, objs = [], userY = 0, userX = -0.55, finishSpin = 0;
+  let timeline = [], T = REAL_T, curSub = null, objs = [], userY = 0, userX = -0.55, finishSpin = 0, finishSpinning = true;
   // 紙の下に隠れた縁の線を消す：平らに重なった状態で、線の上（または下）を別の紙が完全に覆っていれば描かない
   // 紙の下に隠れた縁の線を消す：平らに重なった状態で、上（裏側から見るときは下）の紙に覆われている区間を線から取り除く。
   // 返り値：面ごと・辺ごとに [表面側の見える区間, 裏面側の見える区間]（区間は 0〜1 の [t0,t1] の並び。辺の e.p→e.q 方向）
@@ -805,6 +817,19 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
       el.setAttribute('y', (pts[i].y + pts[i+1].y)/2 + 6);
     });
   }
+  // ⑨ 印：長い斜辺の角（翼と一緒に動く）と、その角が重なる底辺（背骨）上の位置
+  const wingMarks = document.getElementById('wingmarks');
+  function showWingMarks(sub, ang){
+    const on = sub.wingMark === 'preview' || (!!sub.wingMark && ang < Math.PI * 0.999);
+    wingMarks.toggleAttribute('hidden', !on);
+    if (!on) return;
+    holder.updateMatrixWorld(true); camera.updateMatrixWorld(true);
+    const rect = renderer.domElement.getBoundingClientRect();
+    const pt = v => { const w = v.clone(); paper.localToWorld(w); w.project(camera); return [(w.x+1)*rect.width/2, (1-w.y)*rect.height/2]; };
+    const z = 0.5, corner = new THREE.Vector3(0, Y3, z);
+    if (sub.wingMark !== 'preview') corner.applyMatrix4(rotAbout(sub.pivot, sub.axis, sub.sign * ang));
+    [['wm1', corner], ['wm2', new THREE.Vector3(CX, HYP, z)]].forEach(([id, v]) => { const [x, y] = pt(v); const e = document.getElementById(id); e.setAttribute('cx', x); e.setAttribute('cy', y); });
+  }
   function render(stepIdx, p){
     const st = timeline[stepIdx];
     let x = p * st.total, k = 0;
@@ -834,6 +859,7 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
     const vt = ease(lp), v0 = sub.view0, v1 = sub.view1;
     paper.position.set(-(v0.x + (v1.x - v0.x) * vt), -(v0.y + (v1.y - v0.y) * vt), 0);
     viewZoom = v0.zoom + (v1.zoom - v0.zoom) * vt; setZoom(zoom);
+    spin.rotation.z = (sub.rz0 || 0) + ((sub.rz1 || 0) - (sub.rz0 || 0)) * vt;
     { const ch = renderer.domElement.height / Math.min(window.devicePixelRatio, 2) || 600;
       const mmPerPx = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / ch;
       redW = Math.round(3.5 * mmPerPx * 20) / 20; darkW = Math.round(2.5 * mmPerPx * 20) / 20; }
@@ -899,6 +925,7 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
       });
     });
     showA7Guide(stepIdx, p);
+    showWingMarks(sub, ang);
   }
 
   // ================= 操作パネル =================
@@ -923,14 +950,23 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
   }
   function setProgress(p){
     p = Math.max(0, Math.min(1, Number.isFinite(p) ? p : 0));
-    if (step === STEPS.length-1 && p < 1) finishSpin = 0;
+    if (step === STEPS.length-1 && p < 1){ finishSpin = 0; finishSpinning = true; }
     progress = p; slider.value = Math.round(p*1000);
     pct.textContent = Math.round(p*100) + '%';
     render(step, p);
   }
   function setPlaying(v){
-    playing = v; btn.textContent = v ? '一時停止' : '再生';
-    if (v && progress >= 1){ if (step < STEPS.length-1) goStep(step+1, 0); else goStep(0, 0); }
+    // 完成後のクリックは①へ戻さず、自動回転だけを停止／再開する（エアーキングと同じ）。
+    if (v && step === STEPS.length-1 && progress >= 1){
+      playing = false; finishSpinning = !finishSpinning;
+      btn.textContent = finishSpinning ? '回転を停止' : '回転を再開';
+      last = performance.now(); return;
+    }
+    playing = v;
+    btn.textContent = !v && step === STEPS.length-1 && progress >= 1
+      ? (finishSpinning ? '回転を停止' : '回転を再開')
+      : (v ? '一時停止' : '再生');
+    if (v && progress >= 1 && step < STEPS.length-1) goStep(step+1, 0);
     last = performance.now();
   }
   btn.onclick = () => setPlaying(!playing);
@@ -972,7 +1008,7 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
   const up = e => {
     if (tap && tap.id === e.pointerId && e.type === 'pointerup' && !tap.moved && ptrs.size === 1 && performance.now() - tap.t < 400){
       setPlaying(!playing);
-      fx.textContent = playing ? '▶' : '❚❚'; fx.classList.remove('show'); void fx.offsetWidth; fx.classList.add('show');
+      fx.textContent = step === STEPS.length-1 && progress >= 1 ? (finishSpinning ? '▶' : '❚❚') : (playing ? '▶' : '❚❚'); fx.classList.remove('show'); void fx.offsetWidth; fx.classList.add('show');
     }
     if (tap && tap.id === e.pointerId) tap = null;
     ptrs.delete(e.pointerId);
@@ -1002,7 +1038,7 @@ label.chk{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--su
       last = now; setProgress(p);
       if (p >= 1) setPlaying(false);
     }
-    if (step === STEPS.length-1 && progress >= 1){
+    if (step === STEPS.length-1 && progress >= 1 && finishSpinning){
       finishSpin += frameMs * 2 * Math.PI / 32000; // 完成後は約32秒で1回転
       render(step, progress); // 回転につれて表裏の線の可視判定も更新する
     }
