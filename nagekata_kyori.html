@@ -4,7 +4,7 @@
   <meta name="robots" content="noindex, nofollow">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>紙ヒコーキの投げ方（飛行距離） V260926.3</title>
+<title>紙ヒコーキの投げ方（飛行距離） V260927.1</title>
 <style>
 :root{
   --bg:#e6eaef; --bg-3d:#dfe4ea; --ink:#1f2a36; --sub:#5b6775;
@@ -57,7 +57,7 @@ button.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);
 </head>
 <body>
 <header>
-  <h1>紙ヒコーキの投げ方（飛行距離） <small style="font-size:.6em;color:#8E97A2">V260926.3</small></h1>
+  <h1>紙ヒコーキの投げ方（飛行距離） <small style="font-size:.6em;color:#8E97A2">V260927.1</small></h1>
   <p class="step" id="steptext"></p>
 </header>
 <div id="stage"><span class="hint">タップ・スペースキーで再生／停止／ドラッグで回転／ピンチで拡大</span>
@@ -559,8 +559,9 @@ button.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);
     $('grip').hidden = si !== 0;
     document.querySelectorAll('.chip').forEach((c, i) => c.setAttribute('aria-pressed', i === si ? 'true' : 'false'));
     $('prog').value = Math.round(T / T_END * 1000);
-    const h = T > T_REL ? `　距離 ${flightAt(T - T_REL).s.toFixed(1)}m　高さ ${Math.max(0, plane.position.y).toFixed(1)}m` : '';
-    $('clock').textContent = `${T.toFixed(2)}秒${h}${slow && T < T_REL + 0.3 && playing ? '（スロー）' : ''}`;
+    // 秒の数字は出さない（本人の指定）。飛んでいる間の距離・高さと、スローの印だけ出す
+    const h = T > T_REL ? `距離 ${flightAt(T - T_REL).s.toFixed(1)}m　高さ ${Math.max(0, plane.position.y).toFixed(1)}m` : '';
+    $('clock').textContent = `${h}${slow && T < T_REL + 0.3 && playing ? (h ? '　' : '') + '（スロー）' : ''}`;
     $('play').textContent = playing ? '停止' : '再生';
   }
   function resize(){
